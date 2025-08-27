@@ -2,7 +2,9 @@
 
 import BgVideo from "./index/components/bgVideo";
 import MasterPlayer from "./index/components/MasterPlayer";
+import StoreDebug from "./index/components/StoreDebug";
 import { useState } from "react";
+import Overlay from "./index/components/bgVideo";
 
 export default function Home() {
   const [isVideoMuted, setIsVideoMuted] = useState(true);
@@ -17,6 +19,7 @@ export default function Home() {
 
   return (
     <>
+      <StoreDebug />
       <BgVideo />
       
       {/* Mute/Unmute toggle button */}
