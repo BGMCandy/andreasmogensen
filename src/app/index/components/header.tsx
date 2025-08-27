@@ -8,7 +8,7 @@ const Header = () => {
   return (
     <motion.div
       className="fixed top-0 left-0 right-0 z-40"
-      initial={{ y: -60 }}
+      initial={{y: -60 }}
       animate={{ y: isHovered ? 0 : -60 }}
       transition={{ 
         type: "spring", 
@@ -20,10 +20,11 @@ const Header = () => {
       onHoverEnd={() => setIsHovered(false)}
     >
       <motion.main 
-        className="bg-zinc-900/95 backdrop-blur-sm min-h-[80px] border-b border-zinc-700/50 shadow-lg"
-        initial={{ opacity: 0.8 }}
+        className="bg-zinc-900/95 backdrop-blur-sm border-b border-zinc-700/50 shadow-lg"
+        initial={{ opacity: 0.8, minHeight: "120px" }}
         animate={{ 
           opacity: isHovered ? 1 : 0.8,
+          minHeight: isHovered ? "80px" : "120px",
           boxShadow: isHovered ? "0 10px 25px rgba(0,0,0,0.3)" : "0 4px 12px rgba(0,0,0,0.1)"
         }}
         transition={{ duration: 0.3 }}
@@ -38,7 +39,7 @@ const Header = () => {
             }}
             transition={{ duration: 0.4, delay: 0.1 }}
           >
-            Header
+            Welcome to this unofficial fansite
           </motion.div>
           
           {/* Subtle hover indicator */}

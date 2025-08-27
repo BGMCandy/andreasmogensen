@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import UnmuteButton from './unmuteButton';
 
 interface BgVideoProps {
   videoId?: string;
@@ -25,66 +24,35 @@ export default function BgVideo({
     if (!video) return;
 
     const handleCanPlay = () => {
-      console.log('✅ Video can play');
-      console.log('📏 Video dimensions:', video.videoWidth, 'x', video.videoHeight);
-      console.log('🎬 Video element:', video);
-      console.log('🎬 Video element styles:', window.getComputedStyle(video));
       setVideoLoaded(true);
       setError(null);
     };
 
     const handleError = (e: Event) => {
       const target = e.target as HTMLVideoElement;
-      console.error('❌ Video error:', target.error);
       setError(`Video error: ${target.error?.message || 'Unknown error'}`);
       setVideoLoaded(false);
-    };
-
-    const handleLoadStart = () => {
-      console.log('🔄 Video load started');
-    };
-
-    const handleLoadedMetadata = () => {
-      console.log('📊 Video metadata loaded');
-    };
-
-    const handleProgress = () => {
-      console.log('📈 Video loading progress');
-    };
-
-    const handleCanPlayThrough = () => {
-      console.log('🎯 Video can play through');
     };
 
     // Add event listeners
     video.addEventListener('canplay', handleCanPlay);
     video.addEventListener('error', handleError);
-    video.addEventListener('loadstart', handleLoadStart);
-    video.addEventListener('loadedmetadata', handleLoadedMetadata);
-    video.addEventListener('progress', handleProgress);
-    video.addEventListener('canplaythrough', handleCanPlayThrough);
 
     // Start playing the video
     const startVideo = async () => {
       try {
-        console.log('🎬 Setting video source:', videoUrl);
         video.src = videoUrl;
         video.muted = true;
         
-        // Wait for the video to be ready
         video.addEventListener('loadeddata', async () => {
-          console.log('📊 Video data loaded, attempting to play...');
           try {
             await video.play();
-            console.log('🎬 Video started playing (muted)');
           } catch (playErr) {
-            console.error('❌ Failed to play video:', playErr);
             setError('Failed to play video');
           }
         }, { once: true });
         
       } catch (err) {
-        console.error('❌ Failed to setup video:', err);
         setError('Failed to setup video');
       }
     };
@@ -95,36 +63,13 @@ export default function BgVideo({
     return () => {
       video.removeEventListener('canplay', handleCanPlay);
       video.removeEventListener('error', handleError);
-      video.removeEventListener('loadstart', handleLoadStart);
-      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      video.removeEventListener('progress', handleProgress);
-      video.removeEventListener('canplaythrough', handleCanPlayThrough);
     };
   }, []);
-
-  const handleUnmute = () => {
-    if (videoRef.current) {
-      const video = videoRef.current;
-      video.muted = false;
-      setIsMuted(false);
-      console.log('🔊 Video unmuted');
-      console.log('🔊 Video muted state:', video.muted);
-      
-      // Try to play the video again if it was paused due to autoplay restrictions
-      if (video.paused) {
-        video.play().then(() => {
-          console.log('🎬 Video resumed playing after unmute');
-        }).catch(err => {
-          console.error('❌ Failed to resume video:', err);
-        });
-      }
-    }
-  };
 
   return (
     <div 
       className={`fixed inset-0 w-full h-full ${className}`}
-      style={{ zIndex: 0 }}
+      style={{ zIndex: -10 }}
     >
       <video
         ref={videoRef}
@@ -143,15 +88,13 @@ export default function BgVideo({
           height: '100vh',
           objectFit: 'cover',
           objectPosition: 'center',
+          border: 'none',
           pointerEvents: 'none',
-          opacity: 1, // Force full opacity
-          zIndex: 0, // Ensure it's at the bottom
+          opacity: videoLoaded ? 1 : 0,
+          transition: 'opacity 1s ease-in-out',
+          zIndex: -10,
         }}
       />
-      
-      {/* Unmute button */}
-      <UnmuteButton onUnmute={handleUnmute} isMuted={isMuted} />
-      
     </div>
   );
 }

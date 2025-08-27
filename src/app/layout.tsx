@@ -27,10 +27,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
+        style={{ margin: 0, padding: 0 }}
       > 
         <Header />
-        {children}
+        <main className="relative min-h-screen">
+          {children}
+        </main>
         <Footer />
       </body>
     </html>
