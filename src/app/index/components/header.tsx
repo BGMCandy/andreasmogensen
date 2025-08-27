@@ -24,32 +24,24 @@ const Header = () => {
         initial={{ opacity: 0.8, minHeight: "120px" }}
         animate={{ 
           opacity: isHovered ? 1 : 0.8,
-          minHeight: isHovered ? "80px" : "120px",
+          minHeight: isHovered ? "110px" : "120px",
           boxShadow: isHovered ? "0 10px 25px rgba(0,0,0,0.3)" : "0 4px 12px rgba(0,0,0,0.1)"
         }}
         transition={{ duration: 0.3 }}
       >
-        <div className="container mx-auto px-6 py-4">
-          <motion.div 
-            className="text-white text-xl font-semibold"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ 
-              y: isHovered ? 0 : 20, 
-              opacity: isHovered ? 1 : 0.7 
-            }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-          >
-            Welcome to this unofficial fansite
-          </motion.div>
-          
-          {/* Subtle hover indicator */}
-          <motion.div
-            className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-blue-500 rounded-full"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: isHovered ? 1 : 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-          />
-        </div>
+<div className="container mx-auto px-6 py-4 flex items-center">
+  <motion.div 
+    className="text-white text-xl font-semibold flex items-center"
+    initial={{ y: 20, opacity: 0 }}
+    animate={{ 
+      y: isHovered ? 0 : 20, 
+      opacity: isHovered ? 1 : 0.7 
+    }}
+    transition={{ duration: 0.4, delay: 0.1 }}
+  >
+    Welcome to this unofficial fansite
+  </motion.div>
+</div>
       </motion.main>
     </motion.div>
   );

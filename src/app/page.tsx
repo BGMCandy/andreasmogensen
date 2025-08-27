@@ -1,6 +1,7 @@
 'use client';
 
 import BgVideo from "./index/components/bgVideo";
+import MasterPlayer from "./index/components/MasterPlayer";
 import { useState } from "react";
 
 export default function Home() {
@@ -21,7 +22,7 @@ export default function Home() {
       {/* Mute/Unmute toggle button */}
       <button
         onClick={handleToggleMute}
-        className="fixed top-8 right-8 bg-white/90 backdrop-blur-sm border border-white/30 rounded-full p-3 text-gray-800 hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg group z-50"
+        className="fixed top-18 right-18 bg-white/90 backdrop-blur-sm border border-white/30 rounded-full p-3 text-gray-800 hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg group z-50"
       >
         <div className="flex items-center justify-center">
           {isVideoMuted ? (
@@ -52,6 +53,11 @@ export default function Home() {
             <p className="text-white/80 text-lg leading-relaxed">
               Experience the wonder of space exploration through the journey of Denmark&apos;s pioneering astronaut.
             </p>
+          </div>
+          
+          {/* Audio Stem Visualization System */}
+          <div className="mt-8 p-8 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl">
+            <MasterPlayer />
           </div>
         </div>
       </div>
