@@ -16,9 +16,10 @@ export default function MasterPlayer() {
   const [playing, setPlaying]    = useState(false);
   const [ready, setReady]        = useState(false);
   const [stemsReady, setStemsReady] = useState(false);
-  const [logs, setLogs] = useState<LogLine[]>([]);
-  const log = (m: string) =>
-    setLogs((L) => [...L.slice(-40), { t: performance.now(), msg: m }]);
+  // const [logs, setLogs] = useState<LogLine[]>([]);
+  const log = (m: string) => {
+    console.log(`[Audio] ${m}`);
+  };
 
   // ---- write to global store (only when values change)
   const setStore = usePlayerStore((s) => s.set);
@@ -120,7 +121,7 @@ export default function MasterPlayer() {
     const a = masterRef.current;
     if (!a) return;
     if (a.paused) {
-      try { await a.play(); } catch (e) { log("⚠️ play() blocked"); }
+      try { await a.play(); } catch { log("⚠️ play() blocked"); }
     } else {
       a.pause();
     }
@@ -134,7 +135,6 @@ export default function MasterPlayer() {
     const wasPlaying = !a.paused;
 
     // Try fastSeek, else set currentTime
-    // @ts-ignore
     if (typeof a.fastSeek === "function") a.fastSeek(t);
     else a.currentTime = t;
 

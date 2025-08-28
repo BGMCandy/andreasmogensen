@@ -40,7 +40,7 @@ export default function SeekBar({
   const start = (e: React.MouseEvent | React.TouchEvent) => {
     onSeekStart?.();
     setDragging(true);
-    const x = "touches" in e ? e.touches[0].clientX : (e as any).clientX;
+    const x = "touches" in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
     const nt = posToTime(x);
     setT(nt); onSeek?.(nt);
     e.preventDefault();
@@ -48,8 +48,8 @@ export default function SeekBar({
 
   useEffect(() => {
     if (!dragging) return;
-    const move = (ev: any) => {
-      const x = ev.clientX ?? ev.touches?.[0]?.clientX;
+    const move = (ev: PointerEvent | TouchEvent) => {
+      const x = "touches" in ev ? ev.touches[0].clientX : (ev as PointerEvent).clientX;
       if (x == null) return;
       const nt = posToTime(x);
       setT(nt); onSeek?.(nt);

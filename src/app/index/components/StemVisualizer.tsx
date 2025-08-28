@@ -26,7 +26,7 @@ export default function StemVisualizer({ file, label, color, isPlaying, currentT
     audio.loop = true
     audioRef.current = audio
 
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+    const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
     audioContextRef.current = audioContext
 
     const resumeContext = () => {
@@ -37,7 +37,7 @@ export default function StemVisualizer({ file, label, color, isPlaying, currentT
     const source = audioContext.createMediaElementSource(audio)
     const analyser = audioContext.createAnalyser()
     analyser.fftSize = 1024
-    analyser.smoothingTimeConstant = 0.001
+    analyser.smoothingTimeConstant = 0.0001
 
     source.connect(analyser)
     analyserRef.current = analyser
@@ -65,7 +65,7 @@ export default function StemVisualizer({ file, label, color, isPlaying, currentT
   useEffect(() => {
     if (audioRef.current && isPlaying) {
       const timeDiff = Math.abs(audioRef.current.currentTime - currentTime)
-      if (timeDiff > 0.05) audioRef.current.currentTime = currentTime
+      if (timeDiff > 0.0005) audioRef.current.currentTime = currentTime
     }
   }, [currentTime, isPlaying])
 
