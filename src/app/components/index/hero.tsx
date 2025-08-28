@@ -1,6 +1,5 @@
 import React from "react"
 import { motion } from "framer-motion"
-import AudioAnalyzer from "../functions/audioAnalyzer"
 
 export type HeroColorScheme = 'zinc' | 'space' | 'cosmic'
 export type HeroFontFamily = 'noto-sans' | 'noto-serif' | 'noto-mono' | 'audiowide' | 'default'
@@ -46,7 +45,7 @@ const Hero: React.FC<HeroProps> = ({
   }
 
   return (
-    <div className={`opacity-80 relative px-4 bass-pulse ${className}`}>
+    <div className={`opacity-80 relative px-4 ${className}`}>
       
       {/* Glassmorphic hero card */}
       <motion.div

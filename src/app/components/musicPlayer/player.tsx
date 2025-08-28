@@ -1,12 +1,12 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect, useCallback } from "react"
 import { motion, useMotionValue, PanInfo } from "framer-motion"
-import AudioAnalyzer from "../functions/audioAnalyzer"
 
 const Player = () => {
   const [isMuted, setIsMuted] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [bassLevel, setBassLevel] = useState(0) // Add state for bass level
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [dragConstraints, setDragConstraints] = useState({
     left: -1000,
@@ -15,6 +15,13 @@ const Player = () => {
     bottom: 1000
   })
   const audioRef = useRef<HTMLAudioElement>(null)
+  
+  // Audio analyzer refs
+  const audioContextRef = useRef<AudioContext | null>(null)
+  const analyserRef = useRef<AnalyserNode | null>(null)
+  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null)
+  const animationRef = useRef<number | undefined>(undefined)
+  const isAnalyzingRef = useRef<boolean>(false)
   
   // Motion values for dragging
   const x = useMotionValue(position.x)
@@ -59,6 +66,16 @@ const Player = () => {
     }
   }, [x, y])
 
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
+      isAnalyzingRef.current = false
+    }
+  }, [])
+
   const toggleMute = () => {
     if (audioRef.current) {
       if (isMuted) {
@@ -102,6 +119,127 @@ const Player = () => {
     setPosition({ x: info.point.x, y: info.point.y })
   }
 
+  // Start analysis function - defined first
+  const startAnalysis = useCallback(() => {
+    if (!isAnalyzingRef.current || !analyserRef.current) return
+    
+    const analyze = () => {
+      try {
+        if (!analyserRef.current) return
+        
+        // Get real frequency data from the analyser
+        const bufferLength = analyserRef.current.frequencyBinCount
+        const dataArray = new Uint8Array(bufferLength)
+        analyserRef.current.getByteFrequencyData(dataArray)
+        
+        // Calculate bass energy in the 40-110 Hz range
+        const sampleRate = audioContextRef.current?.sampleRate || 44100
+        const binWidth = sampleRate / (bufferLength * 2)
+        const startBin = Math.floor(40 / binWidth)
+        const endBin = Math.floor(110 / binWidth)
+        
+        let bassSum = 0
+        let binCount = 0
+        
+        for (let i = startBin; i <= endBin && i < bufferLength; i++) {
+          bassSum += dataArray[i]
+          binCount++
+        }
+        
+        // Calculate real bass level
+        const rawAvg = bassSum / binCount // 0-255 range
+        const normalized = (rawAvg - 20) / 200 // Subtract noise floor, normalize
+        const finalLevel = Math.max(0, Math.min(1, normalized)) // Clamp 0-1
+        
+        // Update bass level state for the meter
+        setBassLevel(finalLevel)
+        
+        // Drive the hero elements with real bass data
+        const elements = document.querySelectorAll('.bass-pulse')
+        if (elements.length > 0) {
+          elements.forEach((element) => {
+            if (element instanceof HTMLElement) {
+              const scale = 1.0 + (finalLevel * 0.12) // Map to 1.00 → 1.12
+              element.style.transform = `scale(${scale})`
+              element.style.transition = 'transform 0.1s ease-out'
+              element.style.willChange = 'transform'
+            }
+          })
+        }
+        
+        // Debug log once per second with the three numbers
+        if (Math.floor(Date.now() / 1000) !== Math.floor((Date.now() - 16) / 1000)) {
+          console.log('🎵 Real Bass Analysis:', {
+            rawAvg: Math.round(rawAvg),
+            normalized: normalized.toFixed(4),
+            finalLevel: finalLevel.toFixed(4),
+            elements: elements.length,
+            binRange: `${startBin}-${endBin}`,
+            binWidth: `${binWidth.toFixed(1)} Hz`
+          })
+        }
+        
+      } catch (error) {
+        console.error('Analysis error:', error)
+      }
+      
+      if (isAnalyzingRef.current) {
+        animationRef.current = requestAnimationFrame(analyze)
+      }
+    }
+    
+    analyze()
+  }, [])
+
+  // Simple audio analyzer - integrated directly
+  const setupAudioAnalyzer = useCallback(async () => {
+    if (!audioRef.current || isAnalyzingRef.current) return
+    
+    try {
+      console.log('🎯 Setting up real audio analyzer...')
+      
+      // Create AudioContext on first user interaction
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContext()
+        console.log('✅ AudioContext created')
+      }
+      
+      // Resume if suspended
+      if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume()
+        console.log('🔄 AudioContext resumed')
+      }
+      
+      console.log('✅ AudioContext state:', audioContextRef.current.state)
+      
+      // Create analyser
+      if (!analyserRef.current) {
+        analyserRef.current = audioContextRef.current.createAnalyser()
+        analyserRef.current.fftSize = 2048
+        analyserRef.current.smoothingTimeConstant = 0.8
+        console.log('✅ Analyser created')
+      }
+      
+      // Create MediaElementSource and connect BOTH ways
+      if (!sourceRef.current) {
+        sourceRef.current = audioContextRef.current.createMediaElementSource(audioRef.current)
+        
+        // CORRECT WIRING: source → analyser AND source → destination
+        sourceRef.current.connect(analyserRef.current)  // For analysis
+        sourceRef.current.connect(audioContextRef.current.destination)  // For audio output
+        
+        console.log('✅ Audio connected: source → analyser AND source → speakers')
+        console.log('🔗 Dual connection: analysis + playback')
+      }
+      
+      isAnalyzingRef.current = true
+      startAnalysis()
+      
+    } catch (error) {
+      console.error('❌ Audio analyzer setup failed:', error)
+    }
+  }, [startAnalysis])
+
   return (
     <motion.div 
       className="fixed z-50"
@@ -120,16 +258,62 @@ const Player = () => {
       {/* Hidden audio element */}
       <audio 
         ref={audioRef}
-        src="https://files.andreasmogensen.dk/andreasmogensen.mp3"
+        src="https://files.andreasmogensen.dk/andreasmogensen.mp3?v=2"
+        crossOrigin="anonymous"
         preload="metadata"
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onEnded={() => setIsPlaying(false)}
+        onPlay={() => {
+          setIsPlaying(true)
+          console.log('🎵 Audio play event fired')
+          // Start the audio analyzer
+          setupAudioAnalyzer()
+        }}
+        onPause={() => {
+          setIsPlaying(false)
+          console.log('⏸️ Audio pause event fired')
+        }}
+        onEnded={() => {
+          setIsPlaying(false)
+          console.log('🔚 Audio ended event fired')
+        }}
         onError={(e) => {
-          console.error('Audio error:', e)
+          console.error('❌ Audio error:', e)
+          console.error('Audio element error details:', audioRef.current?.error)
+          
+          // Check for CORS errors specifically
+          if (audioRef.current?.error) {
+            const error = audioRef.current.error
+            if (error.code === 4) { // MEDIA_ERR_SRC_NOT_SUPPORTED
+              console.error('🚫 CORS Error: Audio file not accessible due to CORS policy')
+              console.error('💡 Check if Access-Control-Allow-Origin includes:', window.location.origin)
+            }
+          }
         }}
         onCanPlay={() => {
-          console.log('Audio can play')
+          console.log('✅ Audio can play - ready to play')
+        }}
+        onLoadStart={() => {
+          console.log('📥 Audio loading started')
+        }}
+        onLoadedMetadata={() => {
+          console.log('📊 Audio metadata loaded:', {
+            duration: audioRef.current?.duration,
+            readyState: audioRef.current?.readyState,
+            networkState: audioRef.current?.networkState
+          })
+          
+          // Check CORS headers
+          fetch(audioRef.current?.src || '', { method: 'HEAD' })
+            .then(response => {
+              console.log('🔒 CORS Check:', {
+                status: response.status,
+                cors: response.headers.get('Access-Control-Allow-Origin'),
+                contentType: response.headers.get('Content-Type'),
+                contentLength: response.headers.get('Content-Length')
+              })
+            })
+            .catch(error => {
+              console.error('❌ CORS check failed:', error)
+            })
         }}
       />
       
@@ -246,36 +430,27 @@ const Player = () => {
             </motion.button>
           </div>
 
-          {/* Test button */}
-          <div className="text-center mt-2">
-            <button 
-              onClick={() => {
-                if (audioRef.current) {
-                  console.log('Audio state:', {
-                    readyState: audioRef.current.readyState,
-                    networkState: audioRef.current.networkState,
-                    paused: audioRef.current.paused,
-                    currentTime: audioRef.current.currentTime,
-                    duration: audioRef.current.duration
-                  })
-                  
-                  // Test play
-                  audioRef.current.play()
-                    .then(() => console.log('Test play successful'))
-                    .catch(e => console.error('Test play failed:', e))
-                }
-              }}
-              className="text-xs text-zinc-400 hover:text-zinc-200"
-            >
-              Test Audio
-            </button>
-          </div>
-
           {/* Status indicator */}
           <div className="text-center mt-2">
             <div className="text-xs font-mono text-zinc-500">
               {isMuted ? 'MUTED' : isPlaying ? 'PLAYING' : 'STOPPED'}
             </div>
+            
+            {/* Bass meter - shows real bass level */}
+            {isPlaying && (
+              <div className="mt-2">
+                <div className="text-xs font-mono text-zinc-400 mb-1">BASS</div>
+                <div className="w-16 h-2 bg-zinc-800 rounded-full overflow-hidden mx-auto">
+                  <div 
+                    className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-100"
+                    style={{ width: `${bassLevel * 100}%` }}
+                  />
+                </div>
+                <div className="text-xs font-mono text-zinc-500 mt-1">
+                  {bassLevel.toFixed(3)}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -284,7 +459,7 @@ const Player = () => {
       </motion.div>
       
       {/* Audio Analyzer - invisible component that analyzes audio */}
-      {/* <AudioAnalyzer audioElement={audioRef.current} /> */}
+      {/* The AudioAnalyzer component is now integrated into the player */}
     </motion.div>
   )
 }

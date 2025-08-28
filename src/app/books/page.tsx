@@ -18,7 +18,7 @@ export default function Books() {
       <div className="flex items-center justify-center min-h-screen">
         <Hero 
           title="Books" 
-          subtitle="Andreas Mogensen's books"
+          subtitle="Andreas Mogensen&apos;s books"
           colorScheme="cosmic"
           fontFamily="audiowide"
         />
@@ -45,7 +45,7 @@ export default function Books() {
           elements={[
             { type: 'h2', content: 'Life in Zero Gravity', className: 'text-3xl font-bold mb-4' },
             { type: 'h3', content: 'Daily Adventures on the ISS', className: 'text-lg mb-3' },
-            { type: 'p', content: 'A fascinating account of what it\'s really like to live and work in space. From floating through modules to conducting experiments in microgravity, Mogensen shares the reality behind the dream.' },
+            { type: 'p', content: 'A fascinating account of what it&apos;s really like to live and work in space. From floating through modules to conducting experiments in microgravity, Mogensen shares the reality behind the dream.' },
             { type: 'p', content: 'Published: 2023 | Pages: 284 | Genre: Memoir/Science' },
           ]}
           imageSrc="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop"
@@ -60,7 +60,7 @@ export default function Books() {
           elements={[
             { type: 'h2', content: 'Training for the Stars', className: 'text-3xl font-bold mb-4' },
             { type: 'h3', content: 'The Road to Becoming an Astronaut', className: 'text-lg mb-3' },
-            { type: 'p', content: 'An insider\'s look at the rigorous training process that transforms engineers and pilots into space explorers. Mogensen details the physical, mental, and technical challenges.' },
+            { type: 'p', content: 'An insider&apos;s look at the rigorous training process that transforms engineers and pilots into space explorers. Mogensen details the physical, mental, and technical challenges.' },
             { type: 'p', content: 'Published: 2022 | Pages: 312 | Genre: Autobiography/Education' },
           ]}
           imageSrc="https://images.unsplash.com/photo-1516339901601-2e1b4dc0c45e?w=400&h=300&fit=crop"
@@ -93,7 +93,7 @@ export default function Books() {
             </h2>
             <p className="text-zinc-300 mb-6 font-noto-sans">
               These books offer a unique window into the life of a modern astronaut. 
-              Perfect for space enthusiasts, aspiring scientists, and anyone curious about humanity's journey to the stars.
+              Perfect for space enthusiasts, aspiring scientists, and anyone curious about humanity&apos;s journey to the stars.
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-sm text-zinc-400">
               <span className="px-3 py-1 bg-white/10 rounded-full">Space Exploration</span>
