@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react"
 import { motion, useMotionValue, PanInfo } from "framer-motion"
+import AudioAnalyzer from "../functions/audioAnalyzer"
 
 const Player = () => {
   const [isMuted, setIsMuted] = useState(false)
@@ -23,6 +24,15 @@ const Player = () => {
     if (audioRef.current) {
       audioRef.current.loop = true
       audioRef.current.volume = 0.3
+      
+      // Test if audio can load
+      audioRef.current.addEventListener('canplay', () => {
+        console.log('Audio loaded successfully')
+      })
+      
+      audioRef.current.addEventListener('error', (e) => {
+        console.error('Audio failed to load:', e)
+      })
     }
   }, [])
 
@@ -31,15 +41,15 @@ const Player = () => {
     if (typeof window !== 'undefined') {
       setDragConstraints({
         left: -window.innerWidth + 300,
-        right: window.innerWidth - 300,
+        right: window.innerWidth - 20,
         top: -window.innerHeight + 300,
-        bottom: window.innerHeight - 300
+        bottom: window.innerHeight - 20
       })
       
       // Set default position to bottom right corner
       const newPosition = { 
-        x: window.innerWidth - 350, // 350px from right edge
-        y: window.innerHeight - 200  // 200px from bottom edge
+        x: window.innerWidth - 120,
+        y: window.innerHeight - 120
       }
       setPosition(newPosition)
       
@@ -67,8 +77,23 @@ const Player = () => {
         audioRef.current.pause()
         setIsPlaying(false)
       } else {
-        audioRef.current.play()
-        setIsPlaying(true)
+        // Ensure audio context is resumed on first user interaction
+        if (audioRef.current.readyState >= 2) {
+          audioRef.current.play()
+            .then(() => {
+              setIsPlaying(true)
+            })
+            .catch((error) => {
+              console.error('Play failed:', error)
+            })
+        } else {
+          // Wait for audio to be ready
+          audioRef.current.addEventListener('canplay', () => {
+            audioRef.current?.play()
+              .then(() => setIsPlaying(true))
+              .catch(console.error)
+          }, { once: true })
+        }
       }
     }
   }
@@ -96,9 +121,16 @@ const Player = () => {
       <audio 
         ref={audioRef}
         src="https://files.andreasmogensen.dk/andreasmogensen.mp3"
+        preload="metadata"
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         onEnded={() => setIsPlaying(false)}
+        onError={(e) => {
+          console.error('Audio error:', e)
+        }}
+        onCanPlay={() => {
+          console.log('Audio can play')
+        }}
       />
       
       {/* Player container */}
@@ -208,10 +240,35 @@ const Player = () => {
                 </svg>
               ) : (
                 <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217z" clipRule="evenodd" />
                 </svg>
               )}
             </motion.button>
+          </div>
+
+          {/* Test button */}
+          <div className="text-center mt-2">
+            <button 
+              onClick={() => {
+                if (audioRef.current) {
+                  console.log('Audio state:', {
+                    readyState: audioRef.current.readyState,
+                    networkState: audioRef.current.networkState,
+                    paused: audioRef.current.paused,
+                    currentTime: audioRef.current.currentTime,
+                    duration: audioRef.current.duration
+                  })
+                  
+                  // Test play
+                  audioRef.current.play()
+                    .then(() => console.log('Test play successful'))
+                    .catch(e => console.error('Test play failed:', e))
+                }
+              }}
+              className="text-xs text-zinc-400 hover:text-zinc-200"
+            >
+              Test Audio
+            </button>
           </div>
 
           {/* Status indicator */}
@@ -225,6 +282,9 @@ const Player = () => {
         {/* Bottom accent */}
         <div className="h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500" />
       </motion.div>
+      
+      {/* Audio Analyzer - invisible component that analyzes audio */}
+      {/* <AudioAnalyzer audioElement={audioRef.current} /> */}
     </motion.div>
   )
 }

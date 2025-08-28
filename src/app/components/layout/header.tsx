@@ -12,8 +12,7 @@ const Header = () => {
   const navigationLinks: NavLink[] = [
     { href: '/', label: 'Home' },
     { href: '/about', label: 'About' },
-    { href: 'https://github.com', label: 'GitHub', external: true },
-    { href: 'https://linkedin.com', label: 'LinkedIn', external: true }
+    { href: '/books', label: 'Books' }
   ];
 
   return (
@@ -51,7 +50,7 @@ const Header = () => {
               }}
               transition={{ duration: 0.4, delay: 0.1 }}
             >
-              <span className="font-audiowide">Welcome to this unofficial fansite</span>
+              <span className="font-audiowide">The Unofficial Andreas Mogensen Fansite</span>
             </motion.div>
             
             <Navigation 

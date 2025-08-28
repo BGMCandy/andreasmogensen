@@ -1,5 +1,6 @@
 import React from "react"
 import { motion } from "framer-motion"
+import AudioAnalyzer from "../functions/audioAnalyzer"
 
 export type HeroColorScheme = 'zinc' | 'space' | 'cosmic'
 export type HeroFontFamily = 'noto-sans' | 'noto-serif' | 'noto-mono' | 'audiowide' | 'default'
@@ -45,7 +46,8 @@ const Hero: React.FC<HeroProps> = ({
   }
 
   return (
-    <div className={`opacity-80 relative ${className}`}>
+    <div className={`opacity-80 relative px-4 bass-pulse ${className}`}>
+      
       {/* Glassmorphic hero card */}
       <motion.div
         className={`relative z-10 rounded-3xl backdrop-blur-xl border shadow-2xl p-12 text-center ${colors.card}`}
@@ -54,11 +56,11 @@ const Hero: React.FC<HeroProps> = ({
         transition={{ duration: 1.2 }}
       >
         <motion.h1
-          className={`text-5xl md:text-7xl opacity-100 font-extrabold bg-gradient-to-r ${colors.title} bg-clip-text text-transparent drop-shadow-lg ${fontClasses[fontFamily]}`}
+          className={`text-5xl md:text-7xl opacity-100 font-extrabold bg-gradient-to-r cursor-default ${colors.title} bg-clip-text text-transparent drop-shadow-lg ${fontClasses[fontFamily]}`}
         >
           {title}
         </motion.h1>
-        <p className={`mt-6 text-lg md:text-xl text-white/80 ${fontClasses[fontFamily]}`}>
+        <p className={`mt-6 text-lg md:text-xl text-white/80 cursor-default ${fontClasses[fontFamily]}`}>
           {subtitle}
         </p>
       </motion.div>
