@@ -45,7 +45,7 @@ const Hero: React.FC<HeroProps> = ({
   }
 
   return (
-    <div className={`opacity-80 relative px-4 ${className}`}>
+    <div className={`opacity-80 relative px-4 bass-pulse ${className}`}>
       
       {/* Glassmorphic hero card */}
       <motion.div

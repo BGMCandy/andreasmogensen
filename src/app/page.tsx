@@ -30,7 +30,7 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: isVisible ? 1 : 0 }}
         transition={{ duration: 1.5, ease: "easeOut" }}
-        className="absolute inset-0 bass-pulse"
+        className="absolute inset-0"
       >
         <BackgroundSpace {...andromedaBackground} />
       </motion.div>
@@ -57,7 +57,7 @@ export default function Home() {
       
       {/* Stars - positioned above content but scrollable */}
       <div className="relative z-20 min-h-screen">
-        <Cluster stars={mogensenCluster.stars} className="absolute w-full h-full bass-pulse" />
+        <Cluster stars={mogensenCluster.stars} className="absolute w-full h-full" />
       </div>
     </main>
   );

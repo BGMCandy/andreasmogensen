@@ -159,10 +159,50 @@ const Player = () => {
         if (elements.length > 0) {
           elements.forEach((element) => {
             if (element instanceof HTMLElement) {
-              const scale = 1.0 + (finalLevel * 0.12) // Map to 1.00 → 1.12
+              const scale = 1.0 - (finalLevel * 0.12) // Map to 1.00 → 0.88 (inverted)
               element.style.transform = `scale(${scale})`
               element.style.transition = 'transform 0.1s ease-out'
               element.style.willChange = 'transform'
+            }
+          })
+        }
+        
+        // Drive elements with glow effect
+        const glowElements = document.querySelectorAll('.bass-glow')
+        if (glowElements.length > 0) {
+          glowElements.forEach((element) => {
+            if (element instanceof HTMLElement) {
+              const glowIntensity = finalLevel * 0.8
+              const glowSize = finalLevel * 30
+              element.style.boxShadow = `0 0 ${glowSize}px rgba(0, 255, 255, ${glowIntensity})`
+              element.style.transition = 'box-shadow 0.1s ease-out'
+              element.style.willChange = 'box-shadow'
+            }
+          })
+        }
+        
+        // Drive elements with opacity effect
+        const opacityElements = document.querySelectorAll('.bass-opacity')
+        if (opacityElements.length > 0) {
+          opacityElements.forEach((element) => {
+            if (element instanceof HTMLElement) {
+              const opacity = 0.3 + (finalLevel * 0.7) // Map to 0.3 → 1.0
+              element.style.opacity = opacity.toString()
+              element.style.transition = 'opacity 0.1s ease-out'
+              element.style.willChange = 'opacity'
+            }
+          })
+        }
+        
+        // Drive elements with blur effect
+        const blurElements = document.querySelectorAll('.bass-blur')
+        if (blurElements.length > 0) {
+          blurElements.forEach((element) => {
+            if (element instanceof HTMLElement) {
+              const blurAmount = finalLevel * 8 // Map to 0px → 8px blur
+              element.style.filter = `blur(${blurAmount}px)`
+              element.style.transition = 'filter 0.1s ease-out'
+              element.style.willChange = 'filter'
             }
           })
         }
@@ -173,7 +213,12 @@ const Player = () => {
             rawAvg: Math.round(rawAvg),
             normalized: normalized.toFixed(4),
             finalLevel: finalLevel.toFixed(4),
-            elements: elements.length,
+            elements: {
+              scale: elements.length,
+              glow: glowElements.length,
+              opacity: opacityElements.length,
+              blur: blurElements.length
+            },
             binRange: `${startBin}-${endBin}`,
             binWidth: `${binWidth.toFixed(1)} Hz`
           })

@@ -37,7 +37,7 @@ const SiteLinks: React.FC<SiteLinksProps> = ({
   padding = "py-8"
 }) => {
   return (
-    <div className={`flex flex-wrap justify-center items-center gap-2 ${padding} ${maxWidth} mx-auto ${containerClassName} ${className} pointer-events-auto bass-pulse`}>
+    <div className={`flex flex-wrap justify-center items-center gap-2 ${padding} ${maxWidth} mx-auto ${containerClassName} ${className} pointer-events-auto`}>
       {links.map((link, index) => (
         <motion.div
           key={link.href}

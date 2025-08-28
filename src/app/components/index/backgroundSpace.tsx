@@ -80,7 +80,7 @@ const StarsLayer: React.FC<StarLayerConfig> = ({
   }, [count, duration, seed, sizeRange])
 
   return (
-    <div className={`pointer-events-none absolute inset-0 ${className}`}>
+    <div className={`pointer-events-none absolute inset-0 bass-opacity ${className}`}>
       {stars.map((s) => (
         <motion.span
           key={s.id}

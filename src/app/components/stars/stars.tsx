@@ -82,7 +82,7 @@ const InteractiveStar: React.FC<InteractiveStarProps> = ({
 
   return (
     <div
-      className="absolute cursor-pointer"
+      className="absolute cursor-pointe bass-opacity"
       style={{
         top: `${y}vh`,
         left: `${x}vw`,
