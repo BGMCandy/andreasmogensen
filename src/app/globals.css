@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Audiowide&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Noto+Mono:wght@100..900&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -10,6 +12,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-noto-sans: 'Noto Sans', system-ui, sans-serif;
+  --font-noto-serif: 'Noto Serif', Georgia, serif;
+  --font-noto-mono: 'Noto Mono', 'Courier New', monospace;
+  --font-audiowide: 'Audiowide', sans-serif;
+}
+
+/* Ensure Audiowide font is properly applied */
+.font-audiowide {
+  font-family: 'Audiowide', sans-serif !important;
+  font-weight: 400;
+  font-style: normal;
 }
 
 @media (prefers-color-scheme: dark) {

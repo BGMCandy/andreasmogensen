@@ -2,11 +2,13 @@ import React from "react"
 import { motion } from "framer-motion"
 
 export type HeroColorScheme = 'zinc' | 'space' | 'cosmic'
+export type HeroFontFamily = 'noto-sans' | 'noto-serif' | 'noto-mono' | 'audiowide' | 'default'
 
 interface HeroProps {
   title: string
   subtitle: string
   colorScheme?: HeroColorScheme
+  fontFamily?: HeroFontFamily
   className?: string
 }
 
@@ -14,6 +16,7 @@ const Hero: React.FC<HeroProps> = ({
   title, 
   subtitle, 
   colorScheme = 'zinc',
+  fontFamily = 'default',
   className = ""
 }) => {
   const colorSchemes = {
@@ -32,22 +35,30 @@ const Hero: React.FC<HeroProps> = ({
   }
 
   const colors = colorSchemes[colorScheme]
+  
+  const fontClasses = {
+    'noto-sans': 'font-noto-sans',
+    'noto-serif': 'font-noto-serif', 
+    'noto-mono': 'font-noto-mono',
+    'audiowide': 'font-audiowide',
+    'default': ''
+  }
 
   return (
-    <div className={`flex flex-col items-center justify-center min-h-screen opacity-80 relative ${className}`}>
+    <div className={`opacity-80 relative ${className}`}>
       {/* Glassmorphic hero card */}
       <motion.div
-        className={`relative z-10 w-full rounded-3xl backdrop-blur-xl border shadow-2xl p-12 text-center ${colors.card}`}
+        className={`relative z-10 rounded-3xl backdrop-blur-xl border shadow-2xl p-12 text-center ${colors.card}`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2 }}
       >
         <motion.h1
-          className={`text-5xl md:text-7xl opacity-100 font-extrabold bg-gradient-to-r ${colors.title} bg-clip-text text-transparent drop-shadow-lg`}
+          className={`text-5xl md:text-7xl opacity-100 font-extrabold bg-gradient-to-r ${colors.title} bg-clip-text text-transparent drop-shadow-lg ${fontClasses[fontFamily]}`}
         >
           {title}
         </motion.h1>
-        <p className="mt-6 text-lg md:text-xl text-white/80">
+        <p className={`mt-6 text-lg md:text-xl text-white/80 ${fontClasses[fontFamily]}`}>
           {subtitle}
         </p>
       </motion.div>

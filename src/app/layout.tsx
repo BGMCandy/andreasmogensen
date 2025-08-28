@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "./components/layout/header";
 import Footer from "./components/layout/footer";
+import Player from "./components/musicPlayer/player";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
       > 
         <Header />
         <main className="relative min-h-screen">
+          <Player />
           {children}
         </main>
         <Footer />

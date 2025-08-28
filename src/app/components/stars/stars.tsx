@@ -55,11 +55,16 @@ const InteractiveStar: React.FC<InteractiveStarProps> = ({
     }
   }, [open])
 
-  // Auto-flip rule: if star is >80vw, force info box to left
-  const effectivePosition: InfoPos =
-    x > 80 && (infoPosition === "right" || infoPosition === "left")
-      ? "left"
-      : infoPosition
+  // Auto-flip rule: if star is too close to any edge, force info box to opposite side
+  const effectivePosition: InfoPos = (() => {
+    // Simple edge detection with larger safe zones
+    if (x > 70) return "left"      // Right side of screen
+    if (x < 30) return "right"     // Left side of screen
+    if (y > 70) return "top"       // Bottom of screen
+    if (y < 30) return "bottom"    // Top of screen
+    
+    return infoPosition
+  })()
 
   // Info box offset
   const offset = 16
@@ -72,9 +77,12 @@ const InteractiveStar: React.FC<InteractiveStarProps> = ({
       ? { bottom: offset, left: 0 }
       : { top: offset, left: 0 } // bottom
 
+  // Show info box on hover (desktop) or click (mobile)
+  const shouldShowInfo = open || hover
+
   return (
     <div
-      className="absolute"
+      className="absolute cursor-pointer"
       style={{
         top: `${y}vh`,
         left: `${x}vw`,
@@ -97,7 +105,7 @@ const InteractiveStar: React.FC<InteractiveStarProps> = ({
             setOpen((v) => !v)
           }
         }}
-        className="block rounded-full cursor-pointer outline-none"
+        className="block rounded-full cursor-pointer outline-none pointer-cursor"
         style={{
           width: size,
           height: size,
@@ -116,8 +124,8 @@ const InteractiveStar: React.FC<InteractiveStarProps> = ({
         }}
       />
 
-      {/* Info box */}
-      {open && (
+      {/* Info box - shows on hover or click */}
+      {shouldShowInfo && (
         <motion.div
           ref={popRef}
           className="absolute min-w-[16rem] max-w-sm rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md p-4 text-white shadow-xl cursor-default"
