@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #000000;
   --foreground: #171717;
 }
 
@@ -15,13 +15,18 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #000000;
   }
 }
 
+/* Apply the gradient background */
+html,
 body {
+  background: linear-gradient(135deg, #03070e 0%, #070612 50%, #000000 100%);
+  background-color: #000000; /* Fallback color for overflow areas */
+  background-attachment: fixed;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
 }
 
 /* Custom slider styling */
@@ -30,7 +35,7 @@ body {
   height: 20px;
   width: 20px;
   border-radius: 50%;
-  background: #ffffff;
+  background: #000000;
   cursor: pointer;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
@@ -39,7 +44,7 @@ body {
   height: 20px;
   width: 20px;
   border-radius: 50%;
-  background: #ffffff;
+  background: #000000;
   cursor: pointer;
   border: none;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
