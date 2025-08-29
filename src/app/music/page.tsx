@@ -120,7 +120,7 @@ export default function Music() {
                 rel="noopener noreferrer"
                 className="inline-block px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-audiowide font-semibold rounded-xl transition-all duration-300 hover:scale-105 border border-cyan-400/30"
               >
-                🎵 Listen on BGMCandy
+                Listen on BGMCandy
               </a>
             </div>
           </div>

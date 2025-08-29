@@ -4,8 +4,10 @@ export default function Contact() {
   return (  
     <main className='relative min-h-screen bg-black text-white'>
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="text-5xl font-bold mb-6">Contact</h1>
-        <p className="text-xl mb-8">Get in touch with me</p>
+        <div className="text-center mb-8">
+          <h1 className="text-5xl font-bold mb-6 text-white">Contact</h1>
+          <p className="text-xl text-gray-300">Get in touch with me</p>
+        </div>
         
         <div className="text-center space-y-4">
           <div className="bg-white/10 rounded-2xl p-6 border border-white/20">
