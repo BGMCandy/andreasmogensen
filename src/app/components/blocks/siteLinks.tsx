@@ -2,6 +2,18 @@ import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
+// Smooth scroll function for anchor links
+const scrollToSection = (elementId: string) => {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+      inline: 'nearest'
+    });
+  }
+};
+
 export interface SiteLink {
   href: string;
   label: string;
@@ -50,10 +62,33 @@ const SiteLinks: React.FC<SiteLinksProps> = ({
           }}
           className="relative group pointer-events-auto p-3"
         >
-          <Link 
-            href={link.href}
-            className={`relative block w-24 h-1 bg-zinc-800/40 border-l border-r border-zinc-600/30 flex items-center justify-center overflow-hidden transition-all duration-600 ease-out pointer-events-auto group-hover:h-6 group-hover:bg-zinc-700/60 group-hover:border-zinc-500/50 ${linkClassName}`}
-          >
+          {link.href.startsWith('#') ? (
+            <button
+              onClick={() => scrollToSection(link.href.substring(1))}
+              className={`relative block w-24 h-1 bg-zinc-800/40 border-l border-r border-zinc-600/30 flex items-center justify-center overflow-hidden transition-all duration-600 ease-out pointer-events-auto group-hover:h-6 group-hover:bg-zinc-700/60 group-hover:border-zinc-500/50 ${linkClassName}`}
+            >
+              {/* Subtle text reveal */}
+              <span
+                className={`absolute inset-0 flex items-center justify-center text-xs font-audiowide tracking-wider text-zinc-300 opacity-0 group-hover:opacity-100 transition-all duration-400 ease-out ${textClassName}`}
+              >
+                {link.label}
+              </span>
+              
+              {/* Minimal accent line */}
+              <div
+                className={`absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-400 group-hover:w-full transition-all duration-500 ease-out ${glowClassName}`}
+              />
+              
+              {/* Subtle inner glow */}
+              <div
+                className={`absolute inset-0 bg-gradient-to-r from-cyan-400/5 via-blue-400/5 to-purple-400/5 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out ${glowClassName}`}
+              />
+            </button>
+          ) : (
+            <Link 
+              href={link.href}
+              className={`relative block w-24 h-1 bg-zinc-800/40 border-l border-r border-zinc-600/30 flex items-center justify-center overflow-hidden transition-all duration-600 ease-out pointer-events-auto group-hover:h-6 group-hover:bg-zinc-700/60 group-hover:border-zinc-500/50 ${linkClassName}`}
+            >
             {/* Subtle text reveal */}
             <span
               className={`absolute inset-0 flex items-center justify-center text-xs font-audiowide tracking-wider text-zinc-300 opacity-0 group-hover:opacity-100 transition-all duration-400 ease-out ${textClassName}`}
@@ -70,7 +105,8 @@ const SiteLinks: React.FC<SiteLinksProps> = ({
             <div
               className={`absolute inset-0 bg-gradient-to-r from-cyan-400/5 via-blue-400/5 to-purple-400/5 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out ${glowClassName}`}
             />
-          </Link>
+                      </Link>
+          )}
         </motion.div>
       ))}
     </div>

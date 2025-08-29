@@ -16,8 +16,8 @@ export default function Home() {
   const homepageLinks: SiteLink[] = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
-    { href: "/contact", label: "Contact" },
-    { href: "/blog", label: "Blog" }
+    { href: "/books", label: "Books" },
+    { href: "/claim-domain", label: "Claim Domain" }
   ];
 
   useEffect(() => {

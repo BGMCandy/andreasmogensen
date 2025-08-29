@@ -480,7 +480,7 @@ const Player = () => {
           <div className="text-center mb-3">
             <div className="text-xs font-mono text-zinc-400 mb-0.5">TRACK</div>
             <div className="text-xs font-mono text-zinc-200 truncate max-w-28">
-              andreasmogensen.mp3
+              Free Floating
             </div>
           </div>
 

@@ -1,9 +1,11 @@
 import React from "react";
 
 export interface TextElement {
-  type: 'h2' | 'h3' | 'p';
+  type: 'h2' | 'h3' | 'p' | 'button';
   content: string;
   className?: string;
+  onClick?: () => void;
+  buttonVariant?: 'primary' | 'secondary' | 'outline';
 }
 
 export interface TextBoxProps {
@@ -52,6 +54,22 @@ const TextBox: React.FC<TextBoxProps> = ({
           <p 
             key={index}
             className={`text-base md:text-lg font-noto-sans text-zinc-300 leading-relaxed ${baseClasses} ${element.className || ""}`}
+            dangerouslySetInnerHTML={{ __html: element.content }}
+          />
+        );
+      
+      case 'button':
+        const buttonClasses = {
+          primary: "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white border-cyan-400/30",
+          secondary: "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white border-purple-400/30",
+          outline: "bg-transparent border-2 border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10 hover:border-cyan-400/70"
+        };
+        
+        return (
+          <button
+            key={index}
+            onClick={element.onClick}
+            className={`px-8 py-3 rounded-xl font-audiowide font-semibold tracking-wide transition-all duration-300 ease-out border ${buttonClasses[element.buttonVariant || 'primary']} ${baseClasses} ${element.className || ""}`}
             dangerouslySetInnerHTML={{ __html: element.content }}
           />
         );

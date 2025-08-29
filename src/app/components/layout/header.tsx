@@ -12,7 +12,8 @@ const Header = () => {
   const navigationLinks: NavLink[] = [
     { href: '/', label: 'Home' },
     { href: '/about', label: 'About' },
-    { href: '/books', label: 'Books' }
+    { href: '/books', label: 'Books' },
+    { href: '/claim-domain', label: 'Claim Domain' }
   ];
 
   return (
