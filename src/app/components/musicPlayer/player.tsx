@@ -94,23 +94,47 @@ const Player = () => {
         audioRef.current.pause()
         setIsPlaying(false)
       } else {
-        // Ensure audio context is resumed on first user interaction
-        if (audioRef.current.readyState >= 2) {
-          audioRef.current.play()
-            .then(() => {
+        // Mobile-friendly audio playback with proper error handling
+        const playAudio = async () => {
+          try {
+            // For mobile: ensure audio context is resumed
+            if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+              await audioContextRef.current.resume()
+              console.log('🔄 Mobile: AudioContext resumed on play')
+            }
+            
+            // Check if audio is ready
+            if (audioRef.current!.readyState >= 2) {
+              await audioRef.current!.play()
               setIsPlaying(true)
-            })
-            .catch((error) => {
-              console.error('Play failed:', error)
-            })
-        } else {
-          // Wait for audio to be ready
-          audioRef.current.addEventListener('canplay', () => {
-            audioRef.current?.play()
-              .then(() => setIsPlaying(true))
-              .catch(console.error)
-          }, { once: true })
+              console.log('✅ Audio started successfully')
+            } else {
+              // Wait for audio to be ready (common on mobile)
+              audioRef.current!.addEventListener('canplay', async () => {
+                try {
+                  await audioRef.current!.play()
+                  setIsPlaying(true)
+                  console.log('✅ Audio started after canplay event')
+                } catch (error) {
+                  console.error('❌ Play failed after canplay:', error)
+                }
+              }, { once: true })
+            }
+          } catch (error) {
+            console.error('❌ Play failed:', error)
+            
+            // Mobile-specific error handling
+            if (error instanceof Error) {
+              if (error.message.includes('user gesture')) {
+                console.log('📱 Mobile: User gesture required - this is normal')
+              } else if (error.message.includes('autoplay')) {
+                console.log('📱 Mobile: Autoplay blocked - this is normal')
+              }
+            }
+          }
         }
+        
+        playAudio()
       }
     }
   }
@@ -229,14 +253,19 @@ const Player = () => {
       
       // Create AudioContext on first user interaction
       if (!audioContextRef.current) {
-        audioContextRef.current = new AudioContext()
-        console.log('✅ AudioContext created')
+        // Mobile-friendly AudioContext creation
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
+        audioContextRef.current = new AudioContextClass({
+          latencyHint: 'interactive', // Better for mobile
+          sampleRate: 44100 // Standard sample rate
+        })
+        console.log('✅ AudioContext created with mobile optimizations')
       }
       
-      // Resume if suspended
+      // Resume if suspended (critical for mobile)
       if (audioContextRef.current.state === 'suspended') {
         await audioContextRef.current.resume()
-        console.log('🔄 AudioContext resumed')
+        console.log('🔄 AudioContext resumed (mobile requirement)')
       }
       
       console.log('✅ AudioContext state:', audioContextRef.current.state)
@@ -276,13 +305,17 @@ const Player = () => {
         x, 
         y,
         left: 0,
-        top: 0
+        top: 0,
+        touchAction: 'none' // Ensure touch events work properly on mobile
       }}
       drag
       dragMomentum={false}
       dragElastic={0}
       onDrag={handleDrag}
       dragConstraints={dragConstraints}
+      // Mobile-specific touch handling
+      dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+      whileTap={{ scale: 0.95 }}
     >
       {/* Hidden audio element */}
       <audio 
@@ -290,6 +323,7 @@ const Player = () => {
         src="https://files.andreasmogensen.dk/andreasmogensen.mp3?v=2"
         crossOrigin="anonymous"
         preload="metadata"
+        playsInline // Critical for iOS
         onPlay={() => {
           setIsPlaying(true)
           console.log('🎵 Audio play event fired')
