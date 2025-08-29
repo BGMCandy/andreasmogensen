@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Hero from './components/index/hero';
 import BackgroundSpace from './components/index/backgroundSpace';
 import Cluster from './components/stars/cluster';
+import AndreasFloat from './components/index/andreasFloat';
 import { andromedaBackground } from './data/backgrounds/andromeda';
 import mogensenCluster from './data/clusters/andreas-mogensen';
 import { motion } from 'framer-motion';
@@ -36,7 +37,10 @@ export default function Home() {
       </motion.div>
       
       {/* Hero and SiteLinks container - both visible on first screen */}
-      <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center justify-center min-h-screen relative">
+        {/* Floating astronaut - behind content but above background */}
+        <AndreasFloat />
+        
         <Hero   
           title="Andreas Mogensen"
           subtitle="An unofficial fansite"

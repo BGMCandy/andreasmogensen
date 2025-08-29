@@ -40,6 +40,11 @@ body {
   background-attachment: fixed;
   color: var(--foreground);
   min-height: 100vh;
+  /* Prevent text selection */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 /* Custom slider styling */

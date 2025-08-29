@@ -1,0 +1,184 @@
+"use client"
+
+import React, { useEffect, useRef, useState } from "react"
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useAnimationFrame,
+  useReducedMotion,
+  PanInfo,
+} from "framer-motion"
+import Image from "next/image"
+
+const STORAGE_KEY = "andreasFloatPos"
+const DRAGGED_KEY = "andreasFloatHasDragged"
+
+const AndreasFloat: React.FC = () => {
+  // Base motion
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+  const sx = useSpring(x, { stiffness: 60, damping: 12, mass: 0.6 })
+  const sy = useSpring(y, { stiffness: 60, damping: 12, mass: 0.6 })
+
+  // Flair
+  const rot = useMotionValue(0)              // rotateZ (deg)
+  const scale = useMotionValue(1)            // zoom in/out “depth”
+  const glow = useMotionValue(0.22)
+  const vx = useMotionValue(0)
+  const vy = useMotionValue(0)
+
+  // State/refs
+  const [hasDragged, setHasDragged] = useState(false)
+  const isDraggingRef = useRef(false)
+  const prefersReduced = useReducedMotion()
+  const bounds = useRef({ w: 0, h: 0, pad: 24 })
+  const size = { w: 120, h: 120 } // base size; scale anim will make it pop
+
+  // Restore position + dragged state
+  useEffect(() => {
+    const { innerWidth: W, innerHeight: H } = window
+    bounds.current = { w: W, h: H, pad: 24 }
+    const saved = localStorage.getItem(STORAGE_KEY)
+    const dragged = localStorage.getItem(DRAGGED_KEY)
+
+    if (saved) {
+      const { x: px, y: py } = JSON.parse(saved)
+      x.set(px); y.set(py)
+    } else {
+      x.set(Math.min(W - size.w - 48, W * 0.65))
+      y.set(Math.min(H - size.h - 48, H * 0.6))
+    }
+    setHasDragged(!!dragged)
+
+    const onResize = () => {
+      const { innerWidth, innerHeight } = window
+      bounds.current = { w: innerWidth, h: innerHeight, pad: 24 }
+      x.set(clamp(x.get(), bounds.current.pad, innerWidth  - size.w - bounds.current.pad))
+      y.set(clamp(y.get(), bounds.current.pad, innerHeight - size.h - bounds.current.pad))
+    }
+    window.addEventListener("resize", onResize)
+    return () => window.removeEventListener("resize", onResize)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Idle float: bob, rotate, and scale (depth). Pauses while dragging or reduced-motion.
+  useAnimationFrame((t) => {
+    if (prefersReduced || isDraggingRef.current) return
+    const time = t / 1000
+
+    // Subtle bob
+    const bobX = Math.sin(time * 0.55) * 6
+    const bobY = Math.cos(time * 0.72) * 4
+    x.set(x.get() + bobX * 0.08)
+    y.set(y.get() + bobY * 0.08)
+
+    // Spacey rotation (varying rates to avoid loops feeling repetitive)
+    const r =
+      Math.sin(time * 0.35) * 8 +   // slow sway
+      Math.sin(time * 0.11 + 1.7) * 4 + // secondary wobble
+      Math.cos(time * 0.07 + 0.6) * 3   // long drift
+    rot.set(r)
+
+    // Depth (scale) between ~0.9 and ~1.08 with layered waves
+    const sBase = 0.99 + Math.sin(time * 0.5) * 0.045
+    const sMicro = Math.sin(time * 1.7 + 0.9) * 0.015
+    scale.set(clamp(sBase + sMicro, 0.9, 1.08))
+
+    // Glow pulse
+    glow.set(0.22 + (Math.sin(time * 1.2) + 1) * 0.065)
+  })
+
+  function onDragStart() {
+    isDraggingRef.current = true
+  }
+
+  function onDragEnd(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) {
+    isDraggingRef.current = false
+    setHasDragged(true)
+    try { localStorage.setItem(DRAGGED_KEY, "1") } catch {}
+
+    // Clamp to viewport
+    const nx = clamp(info.point.x - size.w / 2, bounds.current.pad, bounds.current.w - size.w - bounds.current.pad)
+    const ny = clamp(info.point.y - size.h / 2, bounds.current.pad, bounds.current.h - size.h - bounds.current.pad)
+    x.set(nx); y.set(ny)
+
+    // Velocity → quick tilt blip
+    vx.set(info.velocity.x); vy.set(info.velocity.y)
+    const angle = clamp(info.velocity.x / 1200, -0.15, 0.15) * 22
+    rot.set(angle)
+    setTimeout(() => rot.set(0), 300)
+
+    // Ease scale back to ~1 after drag
+    scale.set(1)
+
+    // Persist
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ x: nx, y: ny })) } catch {}
+  }
+
+  const shadowX = () => clamp(vx.get() / 700, -8, 8)
+  const shadowY = () => clamp(vy.get() / 700, -6, 10)
+  const blur = () => 16 + Math.min(10, Math.abs(vx.get()) / 200)
+
+  function clamp(v: number, min: number, max: number) { return Math.max(min, Math.min(max, v)) }
+
+  return (
+    <div className="absolute inset-0 z-0 pointer-events-none select-none bass-opacity">
+      <motion.div
+        aria-label="Floating astronaut — click & drag to move"
+        role="img"
+        style={{
+          x: sx,
+          y: sy,
+          rotate: rot,
+          scale,
+          pointerEvents: "auto",
+          touchAction: "none",
+          filter: `drop-shadow(${shadowX()}px ${shadowY()}px ${blur()}px rgba(0,0,0,0.35))`,
+        }}
+        drag
+        dragMomentum={false}
+        dragElastic={0.15}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        whileHover={!prefersReduced ? { scale: 1.06 } : undefined}
+        whileTap={!prefersReduced ? { scale: 0.96 } : undefined}
+        className="relative w-28 h-28 md:w-32 md:h-32"
+      >
+        {/* Glow */}
+        <motion.div
+          className="absolute inset-0 rounded-full blur-2xl"
+          style={{
+            opacity: glow,
+            background: "radial-gradient(closest-side, rgba(80,160,255,0.65), rgba(80,160,255,0))",
+            transform: "scale(1.35)",
+          }}
+          aria-hidden
+        />
+
+        <Image
+          src="https://files.andreasmogensen.dk/andreas_mogensen_floating_in_space_cutsie.png"
+          alt="Andreas Mogensen floating in space"
+          fill
+          className="object-contain"
+          priority
+          draggable={false}
+        />
+
+        {/* Hint — shows until first drag */}
+        {!hasDragged && (
+          <motion.div
+            className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs md:text-sm text-blue-300/70 font-mono pointer-events-none"
+            initial={{ opacity: 0, y: 2 }}
+            animate={{ opacity: [0, 1, 0], y: [2, 0, 0] }}
+            transition={{ duration: 2.2, repeat: 3, ease: "easeInOut", delay: 0.3 }}
+          >
+            Click &amp; drag me!
+          </motion.div>
+        )}
+      </motion.div>
+    </div>
+  )
+}
+
+export default AndreasFloat

@@ -206,23 +206,7 @@ const Player = () => {
             }
           })
         }
-        
-        // Debug log once per second with the three numbers
-        if (Math.floor(Date.now() / 1000) !== Math.floor((Date.now() - 16) / 1000)) {
-          console.log('🎵 Real Bass Analysis:', {
-            rawAvg: Math.round(rawAvg),
-            normalized: normalized.toFixed(4),
-            finalLevel: finalLevel.toFixed(4),
-            elements: {
-              scale: elements.length,
-              glow: glowElements.length,
-              opacity: opacityElements.length,
-              blur: blurElements.length
-            },
-            binRange: `${startBin}-${endBin}`,
-            binWidth: `${binWidth.toFixed(1)} Hz`
-          })
-        }
+      
         
       } catch (error) {
         console.error('Analysis error:', error)
@@ -481,21 +465,6 @@ const Player = () => {
               {isMuted ? 'MUTED' : isPlaying ? 'PLAYING' : 'STOPPED'}
             </div>
             
-            {/* Bass meter - shows real bass level */}
-            {isPlaying && (
-              <div className="mt-2">
-                <div className="text-xs font-mono text-zinc-400 mb-1">BASS</div>
-                <div className="w-16 h-2 bg-zinc-800 rounded-full overflow-hidden mx-auto">
-                  <div 
-                    className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-100"
-                    style={{ width: `${bassLevel * 100}%` }}
-                  />
-                </div>
-                <div className="text-xs font-mono text-zinc-500 mt-1">
-                  {bassLevel.toFixed(3)}
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
