@@ -63,7 +63,7 @@ export default function Music() {
   ];
 
   return (
-    <main className='relative min-h-screen'>
+    <main className='relative min-h-screen pb-24'>
       {/* Background */}
       <BackgroundSpace {...orionBackground} />
       

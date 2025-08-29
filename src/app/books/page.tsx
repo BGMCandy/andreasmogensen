@@ -10,7 +10,7 @@ import FlipBlock from "../components/blocks/flipBlock";
 
 export default function Books() {
   return (
-    <main className='relative min-h-screen'>
+    <main className='relative min-h-screen pb-24'>
       {/* Background */}
       <BackgroundSpace {...minimalBackground} />
       

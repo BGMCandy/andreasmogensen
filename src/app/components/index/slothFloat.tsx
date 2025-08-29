@@ -11,11 +11,11 @@ import {
 } from "framer-motion"
 import Image from "next/image"
 
-const STORAGE_KEY = "andreasFloatPos"
-const DRAGGED_KEY = "andreasFloatHasDragged"
-const SIZE = 220 // Change this value to resize the astronaut (in pixels)
+const STORAGE_KEY = "slothFloatPos"
+const DRAGGED_KEY = "slothFloatHasDragged"
+const SIZE = 64 // Change this value to resize the sloth (in pixels)
 
-const AndreasFloat: React.FC = () => {
+const SlothFloat: React.FC = () => {
   // Base motion
   const x = useMotionValue(0)
   const y = useMotionValue(0)
@@ -47,8 +47,9 @@ const AndreasFloat: React.FC = () => {
       const { x: px, y: py } = JSON.parse(saved)
       x.set(px); y.set(py)
     } else {
-      x.set(Math.min(W - size.w - 48, W * 0.65))
-      y.set(Math.min(H - size.h - 48, H * 0.6))
+      // Position sloth on the left side of the screen
+      x.set(Math.min(W - size.w - 48, W * 0.25))
+      y.set(Math.min(H - size.h - 48, H * 0.5))
     }
     setHasDragged(!!dragged)
 
@@ -68,26 +69,26 @@ const AndreasFloat: React.FC = () => {
     if (prefersReduced || isDraggingRef.current) return
     const time = t / 1000
 
-    // Subtle bob
-    const bobX = Math.sin(time * 0.55) * 6
-    const bobY = Math.cos(time * 0.72) * 4
-    x.set(x.get() + bobX * 0.08)
-    y.set(y.get() + bobY * 0.08)
+    // Subtle bob - sloth moves more slowly and gently
+    const bobX = Math.sin(time * 0.35) * 4
+    const bobY = Math.cos(time * 0.48) * 3
+    x.set(x.get() + bobX * 0.06)
+    y.set(y.get() + bobY * 0.06)
 
-    // Spacey rotation (varying rates to avoid loops feeling repetitive)
+    // Gentle rotation - sloth rotates more slowly
     const r =
-      Math.sin(time * 0.35) * 8 +   // slow sway
-      Math.sin(time * 0.11 + 1.7) * 4 + // secondary wobble
-      Math.cos(time * 0.07 + 0.6) * 3   // long drift
+      Math.sin(time * 0.25) * 6 +   // slow sway
+      Math.sin(time * 0.08 + 1.7) * 3 + // secondary wobble
+      Math.cos(time * 0.05 + 0.6) * 2   // long drift
     rot.set(r)
 
-    // Depth (scale) between ~0.9 and ~1.08 with layered waves
-    const sBase = 0.99 + Math.sin(time * 0.5) * 0.045
-    const sMicro = Math.sin(time * 1.7 + 0.9) * 0.015
-    scale.set(clamp(sBase + sMicro, 0.9, 1.08))
+    // Depth (scale) between ~0.95 and ~1.05 with gentle waves
+    const sBase = 0.98 + Math.sin(time * 0.4) * 0.035
+    const sMicro = Math.sin(time * 1.3 + 0.9) * 0.012
+    scale.set(clamp(sBase + sMicro, 0.95, 1.05))
 
-    // Glow pulse
-    glow.set(0.22 + (Math.sin(time * 1.2) + 1) * 0.065)
+    // Gentle glow pulse
+    glow.set(0.22 + (Math.sin(time * 0.9) + 1) * 0.045)
   })
 
   function onDragStart() {
@@ -126,7 +127,7 @@ const AndreasFloat: React.FC = () => {
   return (
     <div className="absolute inset-0 z-0 pointer-events-none select-none bass-opacity">
       <motion.div
-        aria-label="Floating astronaut — click & drag to move"
+        aria-label="Floating sloth mascot — click & drag to move"
         role="img"
         style={{
           x: sx,
@@ -153,17 +154,17 @@ const AndreasFloat: React.FC = () => {
           className="absolute inset-0 rounded-full blur-2xl"
           style={{
             opacity: glow,
-            background: "radial-gradient(closest-side, rgba(80,160,255,0.65), rgba(80,160,255,0))",
+            background: "radial-gradient(closest-side, rgba(34,197,94,0.65), rgba(34,197,94,0))",
             transform: "scale(1.35)",
           }}
           aria-hidden
         />
 
         <Image
-          src="https://files.andreasmogensen.dk/andreas_mogensen_floating_in_space_cutsie.png"
-          alt="Andreas Mogensen floating in space"
+          src="https://files.andreasmogensen.dk/floating_sloath_mascot.png"
+          alt="Floating sloth mascot"
           fill
-          sizes="(max-width: 768px) 96px, 128px"
+          sizes="(max-width: 768px) 64px, 128px"
           className="object-contain"
           priority
           draggable={false}
@@ -172,7 +173,7 @@ const AndreasFloat: React.FC = () => {
         {/* Hint — shows until first drag */}
         {!hasDragged && (
           <motion.div
-            className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs md:text-sm text-blue-300/70 font-mono pointer-events-none"
+            className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs md:text-sm text-green-300/70 font-mono pointer-events-none"
             initial={{ opacity: 0, y: 2 }}
             animate={{ opacity: [0, 1, 0], y: [2, 0, 0] }}
             transition={{ duration: 2.2, repeat: 3, ease: "easeInOut", delay: 0.3 }}
@@ -185,4 +186,4 @@ const AndreasFloat: React.FC = () => {
   )
 }
 
-export default AndreasFloat
+export default SlothFloat

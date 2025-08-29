@@ -49,7 +49,7 @@ const SiteLinks: React.FC<SiteLinksProps> = ({
   padding = "py-8"
 }) => {
   return (
-    <div className={`flex flex-wrap justify-center items-center gap-2 ${padding} ${maxWidth} mx-auto ${containerClassName} ${className} pointer-events-auto`}>
+    <div className={`flex flex-wrap justify-center items-center gap-2 py-8 px-12 max-w-4xl mx-auto ${containerClassName} ${className} pointer-events-auto`}>
       {links.map((link, index) => (
         <motion.div
           key={link.href}
@@ -65,7 +65,7 @@ const SiteLinks: React.FC<SiteLinksProps> = ({
           {link.href.startsWith('#') ? (
             <button
               onClick={() => scrollToSection(link.href.substring(1))}
-              className={`relative block w-24 h-1 bg-zinc-800/40 border-l border-r border-zinc-600/30 flex items-center justify-center overflow-hidden transition-all duration-600 ease-out pointer-events-auto group-hover:h-6 group-hover:bg-zinc-700/60 group-hover:border-zinc-500/50 ${linkClassName}`}
+              className={`relative block w-32 h-1 bg-zinc-800/40 border-l border-r border-zinc-600/30 flex items-center justify-center overflow-hidden transition-all duration-600 ease-out pointer-events-auto group-hover:h-6 group-hover:bg-zinc-700/60 group-hover:border-zinc-500/50 ${linkClassName}`}
             >
               {/* Subtle text reveal */}
               <span
@@ -87,7 +87,7 @@ const SiteLinks: React.FC<SiteLinksProps> = ({
           ) : (
             <Link 
               href={link.href}
-              className={`relative block w-24 h-1 bg-zinc-800/40 border-l border-r border-zinc-600/30 flex items-center justify-center overflow-hidden transition-all duration-600 ease-out pointer-events-auto group-hover:h-6 group-hover:bg-zinc-700/60 group-hover:border-zinc-500/50 ${linkClassName}`}
+              className={`relative block w-32 h-1 bg-zinc-800/40 border-l border-r border-zinc-600/30 flex items-center justify-center overflow-hidden transition-all duration-600 ease-out pointer-events-auto group-hover:h-6 group-hover:bg-zinc-700/60 group-hover:border-zinc-500/50 ${linkClassName}`}
             >
             {/* Subtle text reveal */}
             <span

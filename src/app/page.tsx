@@ -4,6 +4,7 @@ import Hero from './components/index/hero';
 import BackgroundSpace from './components/index/backgroundSpace';
 import Cluster from './components/stars/cluster';
 import AndreasFloat from './components/index/andreasFloat';
+import SlothFloat from './components/index/slothFloat';
 import { andromedaBackground } from './data/backgrounds/andromeda';
 import mogensenCluster from './data/clusters/andreas-mogensen';
 import { motion } from 'framer-motion';
@@ -25,7 +26,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className='relative min-h-screen'>
+    <main className='relative min-h-screen pb-24'>
       {/* Background with fade in */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -40,6 +41,9 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center min-h-screen relative">
         {/* Floating astronaut - behind content but above background */}
         <AndreasFloat />
+        
+        {/* Floating sloth mascot - positioned on the left side */}
+        <SlothFloat />
         
         <Hero   
           title="Andreas Mogensen"

@@ -2,7 +2,7 @@ import React from "react";
 
 export default function Contact() {
   return (  
-    <main className='relative min-h-screen bg-black text-white'>
+    <main className='relative min-h-screen bg-black text-white pb-24'>
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold mb-6 text-white">Contact</h1>

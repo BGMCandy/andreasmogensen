@@ -44,7 +44,7 @@ export default function About() {
   }, []);
 
   return (
-    <main className='relative min-h-screen'>
+    <main className='relative min-h-screen pb-24'>
       {/* Background with fade in */}
       <motion.div
         initial={{ opacity: 0 }}

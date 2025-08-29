@@ -18,7 +18,7 @@ export default function ClaimDomain() {
 
 
   return (
-    <main className='relative min-h-screen'>
+    <main className='relative min-h-screen pb-24'>
       {/* Background */}
       <BackgroundSpace {...orionBackground} />
       
@@ -39,8 +39,6 @@ export default function ClaimDomain() {
           <SiteLinks 
             links={homepageLinks}
             className="relative z-40"
-            maxWidth="max-w-3xl"
-            padding="py-6 px-6"
           />
         </div>
       </div>

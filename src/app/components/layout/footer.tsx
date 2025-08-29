@@ -1,8 +1,12 @@
 import React from 'react'
+import LayoutNav from '../index/layoutNav'
 
 const Footer = () => {
   return (
-    <footer className='absolute bottom-0 left-0 right-0 z-[9999] py-4'>
+    <footer className='absolute bottom-0 left-0 right-0 z-[9999] py-8'>
+      <div className='mb-4'>
+        <LayoutNav />
+      </div>
       <span className='text-white text-center text-xs block opacity-80  tracking-wider mb-1 hover:opacity-100 hover:text-cyan-300 transition-all duration-300 cursor-default'>
         EXPLORE THE UNIVERSE
       </span>
