@@ -160,6 +160,7 @@ const AndreasFloat: React.FC = () => {
           src="https://files.andreasmogensen.dk/andreas_mogensen_floating_in_space_cutsie.png"
           alt="Andreas Mogensen floating in space"
           fill
+          sizes="(max-width: 768px) 96px, 128px"
           className="object-contain"
           priority
           draggable={false}

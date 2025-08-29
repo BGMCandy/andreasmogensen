@@ -96,14 +96,25 @@ const Player = () => {
   }
 
   const togglePlayPause = () => {
+    console.log('🎵 Play button clicked!')
+    console.log('📱 Device info:', {
+      userAgent: navigator.userAgent,
+      isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+      audioReady: audioRef.current?.readyState,
+      audioContextState: audioContextRef.current?.state
+    })
+    
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause()
         setIsPlaying(false)
+        console.log('⏸️ Audio paused')
       } else {
         // Mobile-friendly audio playback with proper error handling
         const playAudio = async () => {
           try {
+            console.log('🚀 Attempting to play audio...')
+            
             // For mobile: ensure audio context is resumed
             if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
               await audioContextRef.current.resume()
@@ -112,13 +123,16 @@ const Player = () => {
             
             // Check if audio is ready
             if (audioRef.current!.readyState >= 2) {
+              console.log('✅ Audio ready, attempting play...')
               await audioRef.current!.play()
               setIsPlaying(true)
               console.log('✅ Audio started successfully')
             } else {
+              console.log('⏳ Audio not ready, waiting for canplay event...')
               // Wait for audio to be ready (common on mobile)
               audioRef.current!.addEventListener('canplay', async () => {
                 try {
+                  console.log('🎯 Canplay event fired, attempting play...')
                   await audioRef.current!.play()
                   setIsPlaying(true)
                   console.log('✅ Audio started after canplay event')
@@ -143,6 +157,8 @@ const Player = () => {
         
         playAudio()
       }
+    } else {
+      console.error('❌ No audio element reference!')
     }
   }
 
@@ -462,9 +478,16 @@ const Player = () => {
             {/* Play/Pause button */}
             <motion.button
               onClick={togglePlayPause}
-              className="w-6 h-6 bg-gradient-to-r from-zinc-700 to-zinc-600 border border-zinc-500/50 rounded-full flex items-center justify-center hover:from-zinc-600 hover:to-zinc-500 transition-all duration-200"
+              onTouchStart={() => {
+                console.log('📱 Mobile: Touch start on play button')
+              }}
+              onTouchEnd={() => {
+                console.log('📱 Mobile: Touch end on play button')
+              }}
+              className="w-8 h-8 md:w-6 md:h-6 bg-gradient-to-r from-zinc-700 to-zinc-600 border border-zinc-500/50 rounded-full flex items-center justify-center hover:from-zinc-600 hover:to-zinc-500 transition-all duration-200 touch-manipulation"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
+              style={{ touchAction: 'manipulation' }}
             >
               {isPlaying ? (
                 <div className="flex space-x-0.5">
@@ -479,13 +502,20 @@ const Player = () => {
             {/* Mute/Unmute button */}
             <motion.button
               onClick={toggleMute}
-              className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 ${
+              onTouchStart={() => {
+                console.log('📱 Mobile: Touch start on mute button')
+              }}
+              onTouchEnd={() => {
+                console.log('📱 Mobile: Touch end on mute button')
+              }}
+              className={`w-8 h-8 md:w-6 md:h-6 rounded-full flex items-center justify-center transition-all duration-200 touch-manipulation ${
                 isMuted 
                   ? 'bg-gradient-to-r from-red-600 to-red-500 border border-red-400/50' 
                   : 'bg-gradient-to-r from-green-600 to-green-500 border border-green-400/50'
               }`}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
+              style={{ touchAction: 'manipulation' }}
             >
               {isMuted ? (
                 <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
