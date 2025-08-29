@@ -97,9 +97,12 @@ const Player = () => {
 
   const togglePlayPause = () => {
     console.log('🎵 Play button clicked!')
+    
+    // Detect iOS specifically
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
     console.log('📱 Device info:', {
       userAgent: navigator.userAgent,
-      isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+      isIOS,
       audioReady: audioRef.current?.readyState,
       audioContextState: audioContextRef.current?.state
     })
@@ -110,46 +113,53 @@ const Player = () => {
         setIsPlaying(false)
         console.log('⏸️ Audio paused')
       } else {
-        // Mobile-friendly audio playback with proper error handling
+        // iOS-specific audio handling
         const playAudio = async () => {
           try {
             console.log('🚀 Attempting to play audio...')
             
-            // For mobile: ensure audio context is resumed
-            if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
-              await audioContextRef.current.resume()
-              console.log('🔄 Mobile: AudioContext resumed on play')
+            // iOS Safari requires AudioContext to be created/resumed on user gesture
+            if (isIOS) {
+              console.log('🍎 iOS detected - using iOS-specific audio handling')
+              
+              // Create AudioContext if it doesn't exist (iOS requirement)
+              if (!audioContextRef.current) {
+                console.log('🔧 Creating AudioContext for iOS...')
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext
+                audioContextRef.current = new AudioContextClass()
+              }
+              
+              // Resume AudioContext (critical for iOS)
+              if (audioContextRef.current.state === 'suspended') {
+                console.log('🔄 Resuming AudioContext for iOS...')
+                await audioContextRef.current.resume()
+                console.log('✅ AudioContext resumed')
+              }
+              
+              // Setup analyzer if not already done
+              if (!isAnalyzingRef.current) {
+                console.log('🔧 Setting up audio analyzer for iOS...')
+                await setupAudioAnalyzer()
+              }
             }
             
-            // Check if audio is ready
-            if (audioRef.current!.readyState >= 2) {
-              console.log('✅ Audio ready, attempting play...')
-              await audioRef.current!.play()
-              setIsPlaying(true)
-              console.log('✅ Audio started successfully')
-            } else {
-              console.log('⏳ Audio not ready, waiting for canplay event...')
-              // Wait for audio to be ready (common on mobile)
-              audioRef.current!.addEventListener('canplay', async () => {
-                try {
-                  console.log('🎯 Canplay event fired, attempting play...')
-                  await audioRef.current!.play()
-                  setIsPlaying(true)
-                  console.log('✅ Audio started after canplay event')
-                } catch (error) {
-                  console.error('❌ Play failed after canplay:', error)
-                }
-              }, { once: true })
-            }
+            // Attempt to play audio
+            console.log('▶️ Playing audio...')
+            await audioRef.current!.play()
+            setIsPlaying(true)
+            console.log('✅ Audio started successfully!')
+            
           } catch (error) {
             console.error('❌ Play failed:', error)
             
-            // Mobile-specific error handling
-            if (error instanceof Error) {
+            // iOS-specific error handling
+            if (isIOS && error instanceof Error) {
               if (error.message.includes('user gesture')) {
-                console.log('📱 Mobile: User gesture required - this is normal')
+                console.log('🍎 iOS: User gesture required - this is normal')
               } else if (error.message.includes('autoplay')) {
-                console.log('📱 Mobile: Autoplay blocked - this is normal')
+                console.log('🍎 iOS: Autoplay blocked - this is normal')
+              } else if (error.message.includes('not allowed')) {
+                console.log('🍎 iOS: Audio not allowed - may need to reload page')
               }
             }
           }
@@ -344,8 +354,9 @@ const Player = () => {
         ref={audioRef}
         src="https://files.andreasmogensen.dk/andreasmogensen.mp3?v=2"
         crossOrigin="anonymous"
-        preload="metadata"
+        preload="none" // iOS: don't preload to avoid issues
         playsInline // Critical for iOS
+        muted={false} // Ensure not muted initially
         onPlay={() => {
           setIsPlaying(true)
           console.log('🎵 Audio play event fired')
@@ -484,10 +495,13 @@ const Player = () => {
               onTouchEnd={() => {
                 console.log('📱 Mobile: Touch end on play button')
               }}
-              className="w-8 h-8 md:w-6 md:h-6 bg-gradient-to-r from-zinc-700 to-zinc-600 border border-zinc-500/50 rounded-full flex items-center justify-center hover:from-zinc-600 hover:to-zinc-500 transition-all duration-200 touch-manipulation"
+              className="w-10 h-10 md:w-6 md:h-6 bg-gradient-to-r from-zinc-700 to-zinc-600 border border-zinc-500/50 rounded-full flex items-center justify-center hover:from-zinc-600 hover:to-zinc-500 transition-all duration-200 touch-manipulation cursor-pointer"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              style={{ touchAction: 'manipulation' }}
+              style={{ 
+                touchAction: 'manipulation',
+                WebkitTapHighlightColor: 'transparent'
+              }}
             >
               {isPlaying ? (
                 <div className="flex space-x-0.5">
