@@ -3,10 +3,17 @@
 import React, { useState, useRef, useEffect, useCallback } from "react"
 import { motion, useMotionValue, PanInfo } from "framer-motion"
 
+// Type declaration for webkitAudioContext (Safari/iOS support)
+declare global {
+  interface Window {
+    webkitAudioContext: typeof AudioContext
+  }
+}
+
 const Player = () => {
   const [isMuted, setIsMuted] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [bassLevel, setBassLevel] = useState(0) // Add state for bass level
+  // Removed unused bassLevel state
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [dragConstraints, setDragConstraints] = useState({
     left: -1000,
@@ -175,8 +182,7 @@ const Player = () => {
         const normalized = (rawAvg - 20) / 200 // Subtract noise floor, normalize
         const finalLevel = Math.max(0, Math.min(1, normalized)) // Clamp 0-1
         
-        // Update bass level state for the meter
-        setBassLevel(finalLevel)
+        // Bass level calculated for visual effects
         
         // Drive the hero elements with real bass data
         const elements = document.querySelectorAll('.bass-pulse')
@@ -254,7 +260,7 @@ const Player = () => {
       // Create AudioContext on first user interaction
       if (!audioContextRef.current) {
         // Mobile-friendly AudioContext creation
-        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext
         audioContextRef.current = new AudioContextClass({
           latencyHint: 'interactive', // Better for mobile
           sampleRate: 44100 // Standard sample rate
